@@ -1,14 +1,38 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
+import axios from "axios";
 
 const Pdf = () => {
   const [file, setFile] = useState("");
   const [singleProgress, setSingleProgress] = useState(0);
 
-  const postpdf = async(payload : any, option : any) => {
-    console.log(payload , option);
-    
-  }
+  const postpdf = async (payload: any, option: any) => {
+    console.log(payload, option);
+
+    try {
+      const res = await axios.post(
+        "http://localhost:8080/addpdf",
+        payload,
+        option
+      );
+      console.log(res);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const getPdf = async () => {
+    try {
+      const res = await axios.get("http://localhost:8080/getpdf");
+      console.log(res);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    getPdf();
+  }, []);
 
   const handleFile = (e: any) => {
     // console.log(e.target.files[0]);
@@ -18,21 +42,18 @@ const Pdf = () => {
 
   const progress = {
     onUploadProgress: (ProgressEvent: any) => {
-      console.log("m")
+      // console.log("m");
       const { loaded, total } = ProgressEvent;
       const per = Math.floor(((loaded / 1000) * 100) / (total / 100));
-      setSingleProgress(per)
-      console.log(per);
+      setSingleProgress(per);
+      // console.log(per);
     },
   };
 
   const handleClick = async () => {
     const fileupload = new FormData();
     fileupload.append("pdf", file);
-
-
-    await postpdf(fileupload , progress);
-
+    await postpdf(fileupload, progress);
     console.log(fileupload);
   };
   return (
